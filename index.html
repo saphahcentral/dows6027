@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Derech Olam Warning Services</title>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header"></div>
+  <script>
+    fetch("header.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("header").innerHTML = data);
+  </script>
+
+  <!-- Main Content -->
+  <main style="max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.7; font-family: Arial, sans-serif;">
+    <h1>About Derech Olam Warning Services</h1>
+
+    <p><strong>Derech Olam Warning Services (DOW)</strong> exists to highlight unfolding world events in light of the prophetic Scriptures. This platform is dedicated to sounding the alarm — not from opinion or speculation, but from patterns already written in the Word of YHVH (יהוה), the Creator of heaven and earth.</p>
+
+    <p>We do not speak for any denomination, organization, or movement. Our only alignment is with truth, as revealed in the inspired Hebrew Scriptures and the fulfillment of prophecy across history and into the present age.</p>
+
+    <p>The <strong>“Derech Olam”</strong> name (דרך עולם) means “The Eternal Path / The Way Everlasting.” It reflects our calling as watchmen to point people back to the Creator’s way in a time when nations and systems are moving rapidly toward prophetic fulfillment.</p>
+
+    <p><strong>Derech Olam Warning Services</strong> is not about panic, but preparation. It is not about fear, but discernment. It is about giving every person — regardless of background — a chance to pause, consider, and seek YHVH, our Creator, while He may be found.</p>
+
+    <p><em>This is a watchman’s page.</em></p>
+
+    <p><strong>Let those with eyes see, and those with ears hear.</strong></p>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer").innerHTML = data);
+  </script>
+</body>
+</html>
