@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DERECH OLAM WARNING SERVICES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Warnings and urgent updates from Derech Olam Warning Services (DOWS6027).">
+  <meta name="keywords" content="Derech Olam, Warning Services, Prophecy, End Times, Global Events">
+  <meta name="author" content="Derech Olam Ministries">
+  <link rel="stylesheet" href="https://saphahcentral.github.io/saphah/style-public.css">
+</head>
+<body>
+
+  <!-- Header dynamically loaded -->
+  <div id="header-placeholder"></div>
+
+  <!-- Navbar dynamically loaded -->
+  <div id="nav-placeholder"></div>
+
+  <main style="max-width: 900px; margin: 2em auto; padding: 1em;">
+    <h1 style="text-align:center;">Warnings from {{START_DATE}} to {{END_DATE}}</h1>
+    <p style="text-align:center;">Latest news from around the world</p>
+
+    <!--Intro-->
+    <section>
+      <p style="font-size: large;">Greetings, friend!</p>
+      <p style="font-size: large;">Firstly, sorry for not posting for a while - we were very, very busy... We're giving you a FULL update since the last report.</p>
+      <p style="font-size: large;">Secondly, remember our <b><u style="background-color: #fcff01;">ARTICLES</u></b> service. This service INCLUDES a copy of our END TIMES articles and SPECIAL articles in the <b>WEBSITE</b> folder. Special news flashes are also available for quick access. Other folders are available for more articles. This is just in case these articles get removed by people who think they can hide the truth from the world...</p>
+      <p style="color: red; font-size: large; font-weight: bold;">Lastly, please note that the time for the rapture / snatching away is here. The Antichrist / False Messiah has been revealed and is in power now. Please make sure your heart belongs to the Creator alone and that your intentions are to serve Him and Him alone. Do NOT postpone it. DO IT NOW! Tomorrow may be too late forever... SOON we might be in Paradise! ALL the signs for the final 7 years of mankind have been fulfilled. This Rosh Hashanah might be the time of the "Last Trumpet / Shofar". Or even before then... Make sure NOW that you WILL hear the last Shofar blast and not find yourself making the decision that would condemn yourself to Gehinnom!</p>
+      <p style="color: red; font-size: large; font-weight: bold;">The Messiah is coming to take His bride for the Marriage Supper and it is very, very, very imminent! Make sure you're ready for His return. <i>1. Does your heart belong to the Creator or someone or something else, even your own desires? 2. Are your daily, hourly, minutely intentions always to serve Him and Him alone? 3. Are any unbelief and misbelief removed from your life?</i> Make sure NOW before it's too late! If you're not ready NOW, you'll have to be <u>martyred</u> to go to heaven after the Creator has taken the true believers away. <u>We are NOT made for the time of the false Messiah / Antichrist!</u> Rather be ready and go now than not be ready and have to decide at gunpoint to die for your faith (it can be VERY difficult then as chances are you would make the wrong decision)... And that counts whether you're a Christian, a Jew or a Muslim!</p>
+      <p style="color: red; font-size: large; font-weight: bold;">If you think it's a joke, read Revelation NOW! The False Messiah has been revealed AND CONFIRMED in his actions already! And, if you STILL don't know it, it's the new American president and his team is straight out of hell / Gehinnom! Babylon is AMERICA! The time is NOW! Next time we might not be here anymore...</p>
+    </section>
+
+    <hr />
+
+    <!-- WARNINGS -->
+    <section>
+      <h2>1. Middle East, WWIII and related news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. Revival, persecution, false church and related news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. LGBT+ updates and related news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. Economy updates</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. False Messiah, world government updates and related news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. AI, cryptocurrency and related news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. Disaster and other news</h2>
+      <ul>
+        <li><a href="" target="_blank">X</a></li>
+      </ul>
+    </section>
+
+<hr />
+
+    <section>
+      <h3 style="text-align: left;"><span style="font-size: x-large;"><u>📌 PLEASE NOTE</u></span></h3>
+      <p><strong>Above news articles are only <em>part</em> of the whole story.</strong><br />Bookmark and check for more news on these websites:</p>
+      <ul>
+        <li><a href="https://www.prophecynewswatch.com/" target="_blank">Prophecy News Watch</a></li>
+        <li><a href="https://endtimesprophecywatch.com/" target="_blank">End Times Prophecy Watch</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h3><span style="font-size: x-large;"><u>⚠ Are You Ready for What’s About to Come?</u></span></h3>
+      <p><a href="https://www.prophecynewswatch.com/article.cfm?recent_news_id=4517" target="_blank"><strong>PREPARE YOURSELF</strong></a></p>
+      <p>Even our <strong>warnings</strong> can disappear anytime without notice! We might be removed from the earth and the internet before we can post more warnings...</p>
+    </section>
+
+    <section>
+      <h3 style="text-align: left;"><span style="font-size: x-large;"><u>❓ TODAY'S QUESTIONS</u></span></h3>
+      <ul>
+        <li>Are you doing what the Creator wants you to do?</li>
+        <li>Or are you deviating from His orders — even if just slightly?</li>
+      </ul>
+      <p><strong>Forgiveness and a new life is waiting for you! It is better to be ready and prepared for what is about to come NOW!</strong></p>
+      <p>You know what to do… <strong style="background-color: #f1c232; color: red;">GO AND DO IT NOW!</strong></p>
+    </section>
+
+    <hr />
+
+  </main>
+
+  <!-- Footer dynamically loaded -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Dynamic inclusion scripts -->
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(r => r.text())
+      .then(d => document.getElementById('header-placeholder').innerHTML = d);
+
+    // Load navbar
+    fetch('nav_bar.html')
+      .then(r => r.text())
+      .then(d => document.getElementById('nav-placeholder').innerHTML = d);
+
+    // Load footer
+    fetch('footer.html')
+      .then(r => r.text())
+      .then(d => document.getElementById('footer-placeholder').innerHTML = d);
+  </script>
+
+</body>
+</html>
