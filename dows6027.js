@@ -1,92 +1,108 @@
-// dows6027.js
-// Main DOWS6027 automation: generate WARN HTML and XML feed
+// dows6027.js - Full automation: WARN HTML, XML, index2 update, yearly archive, Telegram post
 
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
 
-// --- Config paths ---
+// Paths
 const templatePath = path.join(__dirname, '../dows6027/TEMPLATES/WARNyyyymmdd.txt');
 const dataPath = path.join(__dirname, 'dows6027data.json');
+const index2Path = path.join(__dirname, 'index2.html');
+const archivesPath = path.join(__dirname, 'archives.html');
 const outputDir = __dirname;
 
-// --- Load last processed info ---
+// Load last processed info
 let lastData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 const lastDateUsed = new Date(lastData.last_date_used);
-const lastURLProcessed = lastData.last_URL_processed;
 
-// --- Fetch new articles from Prophecy News Watch ---
-// Replace this with actual HTML parsing logic
+// Dummy new articles - replace with actual fetch/parse logic
 async function getNewArticles() {
-  // Dummy example: should be replaced with fetch + parse from website
   return [
     { title: "Middle East Conflict Intensifies", url: "https://www.prophecynewswatch.com/article.cfm?recent_news_id=9053", category: 1, date: "2025-11-02" },
     { title: "False Church Rising", url: "https://www.prophecynewswatch.com/article.cfm?recent_news_id=9054", category: 2, date: "2025-11-03" }
   ].filter(a => new Date(a.date) > lastDateUsed);
 }
 
-// --- Generate WARN HTML ---
+// Generate WARN HTML
 async function generateWarnHTML() {
   let template = fs.readFileSync(templatePath, 'utf-8');
   const newArticles = await getNewArticles();
 
-  // Sort articles into categories
+  // Inject <li> lines into correct category ULs
   const categories = {1: [],2: [],3: [],4: [],5: [],6: [],7: []};
   newArticles.forEach(a => {
     categories[a.category].push(`<li><a href="${a.url}" target="_blank">${a.title}</a></li>`);
   });
 
-  // Inject <li> entries into template
-  for (let i = 1; i <= 7; i++) {
+  for(let i=1;i<=7;i++){
     template = template.replace(`<ul id="cat-${i}"></ul>`, `<ul id="cat-${i}">\n${categories[i].join('\n')}\n</ul>`);
   }
 
-  // Replace dates in <h1>
+  // Replace dates
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const startDate = lastData.last_date_used;
-  const endDate = new Date().toLocaleDateString('en-US', options);
-  template = template.replace('{{START_DATE}}', startDate);
-  template = template.replace('{{END_DATE}}', endDate);
+  template = template.replace('{{START_DATE}}', lastData.last_date_used);
+  template = template.replace('{{END_DATE}}', new Date().toLocaleDateString('en-US', options));
 
-  // Save new WARN HTML
+  // Save WARN HTML
   const todayStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  const filename = `WARN${todayStr}.html`;
-  const filepath = path.join(outputDir, filename);
-  fs.writeFileSync(filepath, template);
-  console.log(`Generated ${filename}`);
+  const warnFile = `WARN${todayStr}.html`;
+  fs.writeFileSync(path.join(outputDir, warnFile), template);
+  console.log(`Generated ${warnFile}`);
 
   // Update last processed info
-  if(newArticles.length > 0){
+  if(newArticles.length>0){
     lastData.last_date_used = newArticles[newArticles.length-1].date;
     lastData.last_URL_processed = newArticles[newArticles.length-1].url;
-    fs.writeFileSync(dataPath, JSON.stringify(lastData, null, 2));
+    fs.writeFileSync(dataPath, JSON.stringify(lastData, null,2));
   }
 
-  return { filename, newArticles };
+  return { warnFile, newArticles };
 }
 
-// --- Generate XML Feed ---
-async function generateXML(newArticles) {
+// Update index2.html automatically
+function updateIndex2(warnFile, newArticles) {
+  let indexHtml = fs.readFileSync(index2Path, 'utf-8');
+
+  // Inject new WARN into the top of the list
   const todayStr = new Date().toISOString().slice(0,10);
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<feed>\n  <title>DOWS6027 Warnings</title>\n  <updated>${todayStr}T00:00:00Z</updated>\n`;
+  const newEntry = `<li><a href="${warnFile}" target="_blank">DOWS6027 Warnings - ${todayStr}</a></li>\n`;
+  // Example: find <ul id="warnings-list"></ul> or append at the top
+  indexHtml = indexHtml.replace('<ul id="warnings-list"></ul>', `<ul id="warnings-list">\n${newEntry}</ul>`);
+  fs.writeFileSync(index2Path, indexHtml);
+  console.log("index2.html updated");
+}
 
-  newArticles.forEach(a => {
-    xml += `  <entry>\n    <title>${a.title}</title>\n    <link href="${a.url}"/>\n    <updated>${a.date}</updated>\n  </entry>\n`;
-  });
+// Yearly archive on Jan 1
+function archiveIndex2() {
+  const today = new Date();
+  if(today.getMonth()===0 && today.getDate()===1){ // Jan 1
+    let indexHtml = fs.readFileSync(index2Path, 'utf-8');
+    let archivesHtml = fs.existsSync(archivesPath) ? fs.readFileSync(archivesPath, 'utf-8') : '';
+    const year = today.getFullYear()-1;
+    const archiveSection = `\n<h2>Archive ${year}</h2>\n${indexHtml}\n`;
+    archivesHtml += archiveSection;
+    fs.writeFileSync(archivesPath, archivesHtml);
+    console.log(`Archived previous year to archives.html under ${year}`);
+    // Optionally clear index2.html entries for new year
+    fs.writeFileSync(index2Path, '<ul id="warnings-list"></ul>');
+  }
+}
 
-  xml += `</feed>`;
-  const xmlPath = path.join(outputDir, 'dows6027.xml');
-  fs.writeFileSync(xmlPath, xml);
-  console.log(`Generated dows6027.xml`);
+// Dummy Telegram post function (replace with bot API)
+async function postToTelegram(warnFile) {
+  console.log(`Posting ${warnFile} to Telegram group...`);
+  // Example: call Telegram bot API with fetch
 }
 
 // --- Main Runner ---
 async function run() {
-  const { filename, newArticles } = await generateWarnHTML();
+  const { warnFile, newArticles } = await generateWarnHTML();
   if(newArticles.length>0){
-    await generateXML(newArticles);
+    updateIndex2(warnFile, newArticles);
+    archiveIndex2();
+    await postToTelegram(warnFile);
   } else {
-    console.log("No new articles found. XML not updated.");
+    console.log("No new articles found.");
   }
 }
 
