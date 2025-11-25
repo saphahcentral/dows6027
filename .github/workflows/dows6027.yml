@@ -1,0 +1,43 @@
+name: DOWS6027 Automation
+
+# Trigger manually or on push to main branch (when WARN HTML is updated)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'dows6027/*.html'
+      - 'dows6027/TEMPLATES/WARNyyyymmdd.txt'
+
+jobs:
+  post-warnings:
+    runs-on: ubuntu-latest
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # 3️⃣ Install dependencies (if needed)
+      - name: Install dependencies
+        run: npm install
+
+      # 4️⃣ Run the DOWS6027 script
+      - name: Generate WARN HTML, XML, update index, Telegram
+        run: node dows6027.js
+
+      # 5️⃣ Trigger saphahemailservices to post to DOWS6027 Google Group
+      - name: Send Google Group Email
+        run: |
+          # Find the latest WARN HTML file
+          LATEST_WARN=$(ls dows6027/WARN*.html | sort | tail -n1)
+
+          # Send email using saphahemailservices, reading recipients from TXT file
+          node ../saphahemailservices/email-send.js \
+            --subject "New DOWS6027 Warnings Posted" \
+            --body "A new DOWS6027 HTML file has been posted: $LATEST_WARN" \
+            --recipients ../saphahemailservices/emails/dows6027.txt
