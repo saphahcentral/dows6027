@@ -107,3 +107,27 @@ async function run() {
 }
 
 run();
+
+const fs = require('fs');
+const path = require('path');
+
+const scheduleDir = path.join(__dirname, '../saphahemailservices/schedule');
+
+function createEmailTrigger(subject) {
+  const today = new Date();
+  const yyyymmdd = today.toISOString().slice(0,10).replace(/-/g,'');
+  const triggerFile = path.join(scheduleDir, `WARN${yyyymmdd}.txt`);
+  const content = `dows6027@googlegroups.com | ${subject} | ${today.toISOString().slice(0,10)}`;
+
+  if (fs.existsSync(triggerFile)) {
+    console.log(`Trigger file already exists: ${triggerFile}. Skipping creation.`);
+    return;
+  }
+
+  fs.writeFileSync(triggerFile, content);
+  console.log(`Email trigger created: ${triggerFile}`);
+}
+
+// Example usage after all processing
+const subjectLine = `DOWS6027 Warnings Update - ${today.toLocaleDateString('en-US')}`;
+createEmailTrigger(subjectLine);
