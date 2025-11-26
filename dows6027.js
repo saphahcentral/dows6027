@@ -1,7 +1,7 @@
 /**
  * DOWS6027 Automation Script
- * Generates WARN HTML, updates index2.html, archives yearly, posts to Telegram,
- * and creates email trigger for saphahemailservices.
+ * Generates WARN HTML, updates index2.html, archives yearly,
+ * posts to Telegram, and creates email trigger for saphahemailservices.
  */
 
 const fs = require('fs');
@@ -31,12 +31,12 @@ const templatePath = path.join(TEMPLATE_DIR, 'WARNyyyymmdd.txt');
 let templateHTML = fs.readFileSync(templatePath, 'utf-8');
 
 // Replace date placeholders
-templateHTML = templateHTML.replace('{{START_DATE}}', trackingData.last_date_used)
-                           .replace('{{END_DATE}}', format(today, 'MMMM d, yyyy'));
+templateHTML = templateHTML
+  .replace('{{START_DATE}}', trackingData.last_date_used)
+  .replace('{{END_DATE}}', format(today, 'MMMM d, yyyy'));
 
 // === Fetch articles from Prophecy News Watch ===
-// For demo purposes, we simulate article fetching
-// You should replace this with actual scraping / API calls
+// NOTE: This is simulated content. Replace with real fetching logic.
 const articles = [
   {
     url: 'https://www.prophecynewswatch.com/article.cfm?recent_news_id=9053',
@@ -56,6 +56,11 @@ const articles = [
   // Add more articles as needed
 ];
 
+// === EARLY EXIT: If no work to do, exit silently with code 0 ===
+if (!articles || articles.length === 0) {
+  process.exit(0); // Completely silent exit, no logs, no writes
+}
+
 // Inject <li> lines into the correct categories
 articles.forEach(article => {
   const liLine = `<li><a href="${article.url}" target="_blank">${article.title}</a></li>`;
@@ -74,8 +79,8 @@ console.log(`WARN HTML created: ${outputFile}`);
 if (fs.existsSync(INDEX_FILE)) {
   let indexContent = fs.readFileSync(INDEX_FILE, 'utf-8');
   const newLink = `<li><a href="WARN${yyyymmdd}.html" target="_blank">DOWS6027 Warnings ${format(today, 'MMMM d, yyyy')}</a></li>`;
-  
-  // Inject at end of UL or before </ul> of warnings list
+
+  // Insert before </ul>
   indexContent = indexContent.replace(/(<\/ul>)/i, `${newLink}\n$1`);
   fs.writeFileSync(INDEX_FILE, indexContent);
   console.log(`index2.html updated`);
@@ -89,12 +94,12 @@ if (today.getMonth() === 0 && today.getDate() === 1) {
 }
 
 // === Telegram posting ===
-// For demo, we just log; replace with actual Telegram Bot API calls
+// Replace with real Telegram Bot API call
 console.log(`Telegram post simulated for WARN${yyyymmdd}.html`);
 
 // === Update tracking JSON ===
 trackingData.last_date_used = format(today, 'yyyy-MM-dd');
-trackingData.last_URL_processed = articles.length ? articles[articles.length-1].url : trackingData.last_URL_processed;
+trackingData.last_URL_processed = articles.length ? articles[articles.length - 1].url : trackingData.last_URL_processed;
 fs.writeFileSync(DATA_FILE, JSON.stringify(trackingData, null, 2));
 console.log(`Tracking JSON updated: ${DATA_FILE}`);
 
