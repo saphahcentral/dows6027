@@ -9,6 +9,14 @@ const path = require('path');
 const fetch = require('node-fetch'); // for fetching articles
 const { format } = require('date-fns');
 
+// --- Environment variable to detect mode
+const runMode = process.env.run_mode || 'run'; // 'run', 'skip', 'force'
+
+// --- Early exit if run_mode is skip
+if (runMode === 'skip') {
+  process.exit(0); // silent exit for non-last-day scheduled runs
+}
+
 // Paths
 const TEMPLATE_DIR = path.join(__dirname, 'TEMPLATES');
 const OUTPUT_DIR = path.join(__dirname);
@@ -36,7 +44,7 @@ templateHTML = templateHTML
   .replace('{{END_DATE}}', format(today, 'MMMM d, yyyy'));
 
 // === Fetch articles from Prophecy News Watch ===
-// NOTE: This is simulated content. Replace with real fetching logic.
+// Simulated content for demonstration; replace with real fetch
 const articles = [
   {
     url: 'https://www.prophecynewswatch.com/article.cfm?recent_news_id=9053',
@@ -53,12 +61,11 @@ const articles = [
     title: 'LGBT+ policy changes',
     category: 3
   }
-  // Add more articles as needed
 ];
 
-// === EARLY EXIT: If no work to do, exit silently with code 0 ===
+// --- Exit silently if no articles (even for forced/manual runs)
 if (!articles || articles.length === 0) {
-  process.exit(0); // Completely silent exit, no logs, no writes
+  process.exit(0);
 }
 
 // Inject <li> lines into the correct categories
@@ -79,8 +86,6 @@ console.log(`WARN HTML created: ${outputFile}`);
 if (fs.existsSync(INDEX_FILE)) {
   let indexContent = fs.readFileSync(INDEX_FILE, 'utf-8');
   const newLink = `<li><a href="WARN${yyyymmdd}.html" target="_blank">DOWS6027 Warnings ${format(today, 'MMMM d, yyyy')}</a></li>`;
-
-  // Insert before </ul>
   indexContent = indexContent.replace(/(<\/ul>)/i, `${newLink}\n$1`);
   fs.writeFileSync(INDEX_FILE, indexContent);
   console.log(`index2.html updated`);
@@ -93,11 +98,10 @@ if (today.getMonth() === 0 && today.getDate() === 1) {
   console.log(`Yearly archive created: ${archiveFile}`);
 }
 
-// === Telegram posting ===
-// Replace with real Telegram Bot API call
+// === Telegram posting (demo) ===
 console.log(`Telegram post simulated for WARN${yyyymmdd}.html`);
 
-// === Update tracking JSON ===
+// === Update tracking JSON BEFORE email trigger ===
 trackingData.last_date_used = format(today, 'yyyy-MM-dd');
 trackingData.last_URL_processed = articles.length ? articles[articles.length - 1].url : trackingData.last_URL_processed;
 fs.writeFileSync(DATA_FILE, JSON.stringify(trackingData, null, 2));
