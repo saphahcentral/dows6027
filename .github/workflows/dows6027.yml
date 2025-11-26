@@ -1,13 +1,15 @@
 name: DOWS6027 Automation
 
 on:
-  workflow_dispatch: # manual trigger
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force run (ignore last-day check)"
+        required: false
+        default: "true"
   schedule:
-    # Run daily at 00:00 UTC — workflow will exit early unless it's the last day of the month.
-    - cron: '0 0 * * *'
-
-env:
-  DOWS_RUN_MODE: monthly
+    # Run on the last day of every month at 00:00 UTC
+    - cron: '0 0 L * *'
 
 jobs:
   run_dows6027:
@@ -23,24 +25,33 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        run: npm install node-fetch date-fns
+
+      - name: Determine run mode
+        id: mode
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
+          # If manual dispatch, force run
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_mode=force" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
-      - name: Ensure this is the last day of the month (UTC) — exit 0 silently if not
-        id: lastday
-        run: |
+          # Scheduled run → perform last-day check
           TODAY_UTC=$(date -u +%d)
           LAST_UTC=$(date -u -d "$(date -u +%Y-%m-1) +1 month -1 day" +%d)
 
           if [ "$TODAY_UTC" != "$LAST_UTC" ]; then
+            # Not the last day → skip execution
+            echo "run_mode=skip" >> $GITHUB_OUTPUT
             exit 0
           fi
 
+          # Last day of month → run normally
+          echo "run_mode=run" >> $GITHUB_OUTPUT
+
+      - name: Stop if run_mode is skip
+        if: steps.mode.outputs.run_mode == 'skip'
+        run: exit 0
+
       - name: Run DOWS6027 automation
         run: node dows6027.js
-        env:
-          DOWS_RUN_MODE: ${{ env.DOWS_RUN_MODE }}
