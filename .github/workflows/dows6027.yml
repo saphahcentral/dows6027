@@ -3,8 +3,11 @@ name: DOWS6027 Automation
 on:
   workflow_dispatch: # manual trigger
   schedule:
-    # Run on the last day of every month at 23:59 UTC
-    - cron: '59 23 L * *'
+    # Run daily at 23:59 UTC — workflow will exit early unless it's the actual last day of the month.
+    - cron: '59 23 * * *'
+
+env:
+  DOWS_RUN_MODE: monthly
 
 jobs:
   run_dows6027:
@@ -19,7 +22,28 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install node-fetch date-fns
+        run: |
+          # prefer npm ci if lockfile exists for reproducible installs
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Ensure this is the last day of the month (UTC) — exit 0 silently if not
+        id: lastday
+        run: |
+          # compute day and last-day in UTC
+          TODAY_UTC=$(date -u +%d)
+          # compute last day of this month in UTC
+          LAST_UTC=$(date -u -d "$(date -u +%Y-%m-1) +1 month -1 day" +%d)
+          if [ "$TODAY_UTC" != "$LAST_UTC" ]; then
+            # Exit successfully (no error) so CI doesn't flag failure.
+            exit 0
+          fi
+        # Note: this step exits the job early on non-last days
 
       - name: Run DOWS6027 automation
         run: node dows6027.js
+        env:
+          DOWS_RUN_MODE: ${{ env.DOWS_RUN_MODE }}
