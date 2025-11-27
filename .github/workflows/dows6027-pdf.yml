@@ -1,7 +1,7 @@
 name: DOWS6027 PDF Automation
 
 on:
-  workflow_dispatch: # manual trigger
+  workflow_dispatch:       # manual trigger
   schedule:
     # Run daily at 00:00 UTC
     - cron: '0 0 * * *'
@@ -12,7 +12,7 @@ jobs:
     env:
       run_mode: run
       DOWS_DRIVE_FOLDER_ID: ${{ secrets.DOWS_DRIVE_FOLDER_ID }}
-      SAPHAH_EMAIL_PASS: ${{ secrets.SAPHAH_EMAIL_PASS }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -23,7 +23,14 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install node-fetch puppeteer jsdom googleapis nodemailer date-fns fs-extra
+        run: |
+          npm install googleapis nodemailer mime-types
+
+      - name: Create secret files for script
+        run: |
+          echo "${{ secrets.DOWS6027_PDF_EMAIL }}" > DOWS6027_PDF_EMAIL
+          echo "${{ secrets.DOWS6027_PDF_SECRET }}" > DOWS6027_PDF_SECRET
+          echo '${{ secrets.DOWS6027_PDF_ADMIN }}' > DOWS6027_PDF_ADMIN
 
       - name: Run DOWS6027 PDF Automation
         run: node dows6027-pdf.js
