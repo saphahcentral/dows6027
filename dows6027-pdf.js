@@ -1,9 +1,8 @@
 /**
  * dows6027-pdf.js
- * DOWS6027 PDF automation:
- *  - Reads secrets from DOWS6027_PDF_EMAIL and DOWS6027_PDF_SECRET
- *  - Uploads PDFs to Google Drive
- *  - Sends error emails if PDF generation or upload fails
+ * FINAL VERSION — using:
+ *  - Gmail (email + app password) for error emails
+ *  - Google Drive SERVICE ACCOUNT JSON from DOWS6027_PDF_ADMIN
  */
 
 const fs = require('fs');
@@ -11,36 +10,38 @@ const path = require('path');
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 
-// --- CONFIG ---
-// Paths to secrets
+// Secret file paths
 const EMAIL_FILE = path.join(__dirname, 'DOWS6027_PDF_EMAIL');
-const SECRET_FILE = path.join(__dirname, 'DOWS6027_PDF_SECRET');
+const PASS_FILE = path.join(__dirname, 'DOWS6027_PDF_SECRET');
+const ADMIN_FILE = path.join(__dirname, 'DOWS6027_PDF_ADMIN');
 
-// Google Drive folder ID (GitHub secret or hardcoded)
-const DRIVE_FOLDER_ID = process.env.DOWS_DRIVE_FOLDER_ID || 'YOUR_FOLDER_ID_HERE';
+// Drive folder ID
+const DRIVE_FOLDER_ID = process.env.DOWS_DRIVE_FOLDER_ID;
 
-// Directory where PDFs are stored/generated
-const PDF_DIR = path.join(__dirname, 'PDFS'); // adjust path
+// PDF directory
+const PDF_DIR = path.join(__dirname, 'PDFS');
 
-// --- READ SECRETS ---
-if (!fs.existsSync(EMAIL_FILE) || !fs.existsSync(SECRET_FILE)) {
-  console.error('ERROR: Secret files missing.');
+// --- Verify secrets ---
+if (!fs.existsSync(EMAIL_FILE) || !fs.existsSync(PASS_FILE) || !fs.existsSync(ADMIN_FILE)) {
+  console.error("ERROR: One or more secret files missing.");
   process.exit(1);
 }
+
 const email = fs.readFileSync(EMAIL_FILE, 'utf-8').trim();
-const secret = fs.readFileSync(SECRET_FILE, 'utf-8').trim();
-if (!email || !secret) {
-  console.error('ERROR: Secret email or password missing.');
+const password = fs.readFileSync(PASS_FILE, 'utf-8').trim();
+const adminJSON = path.join(__dirname, 'DOWS6027_PDF_ADMIN');
+
+if (!email || !password) {
+  console.error("ERROR: Gmail email or password missing.");
   process.exit(1);
 }
 
-// --- EMAIL SETUP ---
+// --- EMAIL ERROR REPORTING ---
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    type: 'OAuth2',
     user: email,
-    refreshToken: secret // Using your secret as OAuth2 token
+    pass: password
   }
 });
 
@@ -52,64 +53,66 @@ async function sendErrorEmail(subject, text) {
       subject,
       text
     });
-    console.log('✅ Error email sent.');
+    console.log("✔ Error email sent.");
   } catch (err) {
-    console.error('ERROR sending email:', err);
+    console.error("ERROR sending error email:", err);
   }
 }
 
-// --- GOOGLE DRIVE SETUP ---
+// --- GOOGLE DRIVE AUTH (SERVICE ACCOUNT) ---
 const auth = new google.auth.GoogleAuth({
-  keyFile: SECRET_FILE, // your OAuth2 secret file
-  scopes: ['https://www.googleapis.com/auth/drive.file']
+  keyFile: ADMIN_FILE,
+  scopes: ["https://www.googleapis.com/auth/drive.file"]
 });
 
-const drive = google.drive({ version: 'v3', auth });
+const drive = google.drive({ version: "v3", auth });
 
+// Upload a PDF
 async function uploadPDF(filePath) {
   try {
     const fileName = path.basename(filePath);
+
     const res = await drive.files.create({
       requestBody: {
         name: fileName,
         parents: [DRIVE_FOLDER_ID]
       },
       media: {
-        mimeType: 'application/pdf',
+        mimeType: "application/pdf",
         body: fs.createReadStream(filePath)
       }
     });
-    console.log(`✅ Uploaded PDF: ${fileName} (ID: ${res.data.id})`);
+
+    console.log(`✔ Uploaded PDF: ${fileName} (ID: ${res.data.id})`);
+
   } catch (err) {
-    console.error(`ERROR uploading PDF ${filePath}:`, err.message);
-    await sendErrorEmail('DOWS6027 PDF Upload Failed', `Failed to upload ${filePath}\n\n${err.message}`);
+    console.error(`UPLOAD ERROR for ${filePath}: ${err.message}`);
+    await sendErrorEmail("DOWS6027 PDF Upload Failed", `${filePath}\n\n${err.message}`);
   }
 }
 
-// --- MAIN FUNCTION ---
+// MAIN
 async function main() {
   if (!fs.existsSync(PDF_DIR)) {
-    console.log('No PDFs to upload. Exiting.');
+    console.log("No PDF directory. Exiting.");
     return;
   }
 
-  const pdfFiles = fs.readdirSync(PDF_DIR).filter(f => f.endsWith('.pdf'));
-  if (pdfFiles.length === 0) {
-    console.log('No PDFs found in PDF directory. Exiting.');
+  const pdfs = fs.readdirSync(PDF_DIR).filter(f => f.endsWith(".pdf"));
+  if (pdfs.length === 0) {
+    console.log("No PDFs to upload. Exiting.");
     return;
   }
 
-  for (const pdf of pdfFiles) {
-    const fullPath = path.join(PDF_DIR, pdf);
-    await uploadPDF(fullPath);
+  for (const f of pdfs) {
+    await uploadPDF(path.join(PDF_DIR, f));
   }
 
-  console.log('DOWS6027 PDF automation complete.');
+  console.log("✔ DOWS6027 PDF automation complete.");
 }
 
-// Run the script
-main().catch(async (err) => {
-  console.error('ERROR in main script:', err);
-  await sendErrorEmail('DOWS6027 PDF Script Error', err.toString());
+main().catch(async err => {
+  console.error("SCRIPT ERROR:", err);
+  await sendErrorEmail("DOWS6027 PDF Script Crash", err.toString());
   process.exit(1);
 });
