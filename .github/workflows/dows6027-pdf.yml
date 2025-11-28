@@ -1,17 +1,17 @@
 name: DOWS6027 PDF Automation
 
 on:
-  workflow_dispatch:       # manual trigger
+  workflow_dispatch:       # Manual trigger
   schedule:
-    # Run daily at 00:00 UTC
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"    # Daily at 00:00 UTC
 
 jobs:
   run_dows6027_pdf:
     runs-on: ubuntu-latest
+
     env:
-      run_mode: run
       DOWS_DRIVE_FOLDER_ID: ${{ secrets.DOWS_DRIVE_FOLDER_ID }}
+      run_mode: run
 
     steps:
       - name: Checkout repository
@@ -20,17 +20,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: |
-          npm install googleapis nodemailer mime-types
+          npm install googleapis nodemailer mime-types fs-extra node-fetch
 
-      - name: Create secret files for script
+      - name: Create OAuth2 secret files
         run: |
           echo "${{ secrets.DOWS6027_PDF_EMAIL }}" > DOWS6027_PDF_EMAIL
           echo "${{ secrets.DOWS6027_PDF_SECRET }}" > DOWS6027_PDF_SECRET
-          echo '${{ secrets.DOWS6027_PDF_ADMIN }}' > DOWS6027_PDF_ADMIN
+          echo "${{ secrets.DOWS6027_PDF_ADMIN }}" > DOWS6027_PDF_ADMIN
 
       - name: Run DOWS6027 PDF Automation
         run: node dows6027-pdf.js
