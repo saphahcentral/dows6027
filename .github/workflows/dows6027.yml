@@ -9,12 +9,15 @@ on:
         default: "true"
 
   schedule:
-    # GitHub Actions does NOT support L, so run daily at 00:00 UTC
+    # Run daily at 00:00 UTC (we detect last-day inside the job)
     - cron: "0 0 * * *"
 
 jobs:
   run_dows6027:
     runs-on: ubuntu-latest
+    env:
+      # pass-through; dows6027.js reads run_mode from workflow output
+      DOWS_RUN_MODE: run
 
     steps:
       - name: Checkout repository
@@ -25,8 +28,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: npm install node-fetch date-fns
+      - name: Install dependencies (use npm ci when possible)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Determine run mode
         id: mode
@@ -57,6 +65,9 @@ jobs:
       - name: Stop if run_mode is skip
         if: steps.mode.outputs.run_mode == 'skip'
         run: exit 0
+
+      - name: Write run_mode env for node
+        run: echo "run_mode=${{ steps.mode.outputs.run_mode }}" >> $GITHUB_ENV
 
       - name: Run DOWS6027 automation
         run: node dows6027.js
