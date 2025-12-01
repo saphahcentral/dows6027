@@ -171,7 +171,12 @@ async function fetchAllArticles(urls) {
 
     // --- Telegram posting ---
     const warnURL = `https://saphahcentral.github.io/dows6027/WARN${yyyymmdd}.html`;
-    await sendTelegramUpdate(`Latest WARNING message posted.\n\n${warnURL}`);
+    await sendTelegramUpdate(
+      "DOWS6027",
+      "Latest WARNING message posted.",
+      warnURL,
+      yyyymmdd
+    );
     console.log(`✅ Telegram bot posted WARN${yyyymmdd}.html`);
 
     // Update tracking JSON
