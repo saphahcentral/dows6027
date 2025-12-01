@@ -1,51 +1,48 @@
-// telegram-post.js — DOWS6027 / DOM6027 / SAPHAHCENTRAL Telegram Posting Service
-// -------------------------------------------------------------
-// Usage:
-//   import { sendTelegramMessage } from './telegram-post.js';
-//   await sendTelegramMessage("Your message text here");
-// -------------------------------------------------------------
+/**
+ * telegram-bot.js — Trigger generator for Telegram posting
+ * ---------------------------------------------------------
+ * This file only creates a trigger file.
+ * DOTS6027-CONSOLE will detect, parse, and post the message.
+ */
 
-import fetch from 'node-fetch';
+const fs = require('fs');
+const path = require('path');
 
-// Inject your BOT TOKEN and CHAT ID via environment vars:
-// TELEGRAM_BOT_TOKEN="123:ABC"  TELEGRAM_CHAT_ID="-1000000000"
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+// DOTS6027-CONSOLE trigger directory
+const TRIGGER_DIR = path.join(__dirname, '../DOTS6027-CONSOLE/telegram-triggers');
 
-if (!BOT_TOKEN || !CHAT_ID) {
-  console.error("❌ Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID in environment variables.");
+// Ensure directory exists
+if (!fs.existsSync(TRIGGER_DIR)) {
+  fs.mkdirSync(TRIGGER_DIR, { recursive: true });
 }
 
 /**
- * sendTelegramMessage
- * Sends a text message to Telegram using the bot.
+ * Create service-specific Telegram trigger file.
+ *
+ * @param {string} serviceName  - "DOWS6027" or "DOM6027"
+ * @param {string} message      - main message line
+ * @param {string} warnURL      - URL for the post
+ * @param {string} yyyymmdd     - date code for filename
  */
-export async function sendTelegramMessage(text) {
+async function sendTelegramUpdate(serviceName, message, warnURL, yyyymmdd) {
   try {
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    const triggerName = `WARN${yyyymmdd}.telegram`;
+    const triggerPath = path.join(TRIGGER_DIR, triggerName);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text,
-        parse_mode: 'HTML',
-        disable_web_page_preview: false
-      })
-    });
+    const content =
+`SERVICE:${serviceName}
 
-    const data = await response.json();
+${message}
 
-    if (!data.ok) {
-      console.error("❌ Telegram API error:", data);
-    } else {
-      console.log("✔ Telegram message sent.");
-    }
+${warnURL}
+`;
 
-    return data;
+    fs.writeFileSync(triggerPath, content.trim() + "\n");
+
+    console.log(`📨 Telegram trigger created for ${serviceName}: ${triggerName}`);
   } catch (err) {
-    console.error("❌ Error sending Telegram message:", err);
-    throw err;
+    console.error('Error writing Telegram trigger:', err.message);
   }
 }
+
+module.exports = { sendTelegramUpdate };
